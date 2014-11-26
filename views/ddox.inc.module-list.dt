@@ -3,6 +3,10 @@
 - void moduleNavList(Package pack)
 	- foreach(p; pack.packages)
 		- moduleNavList(p);
+		- if (p.packageModule !is null)
+			li
+				- auto m = p.packageModule;
+				a(href="#{info.linkTo(m)}")= m.qualifiedName
 	- foreach(m; pack.modules)
 		li
 			a(href="#{info.linkTo(m)}")= m.qualifiedName

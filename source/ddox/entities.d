@@ -133,7 +133,7 @@ class Entity {
 						ret = res;
 						return false;
 					}
-					return true; 
+					return true;
 				});
 				return ret;
 			}
@@ -171,6 +171,7 @@ final class DocGroup {
 final class Package : Entity {
 	Package[] packages;
 	Module[] modules;
+	Module packageModule;
 
 	this(Entity parent, string name){ super(parent, name); }
 
@@ -178,6 +179,12 @@ final class Package : Entity {
 
 	Module createModule(string name)
 	{
+		if( auto p = findChild!Package(name) ) {
+			// package module
+			assert(p.packageModule is null, "Module already present");
+			p.packageModule = new Module(this, name);
+			return p.packageModule;
+		}
 		assert(findChild!Module(name) is null, "Module already present");
 		auto mod = new Module(this, name);
 		modules ~= mod;
@@ -192,6 +199,12 @@ final class Package : Entity {
 		auto pack = new Package(this, name);
 		pack.docGroup = new DocGroup(pack, null);
 		packages ~= pack;
+		foreach( i, m; modules ) {
+			// package module
+			if( m.name != name ) continue;
+			pack.packageModule = m;
+			modules = modules.remove(i);
+		}
 		return pack;
 	}
 
@@ -340,7 +353,7 @@ class CompositeTypeDeclaration : Declaration {
 
 	override @property string kindCaption() const { return "Composite type"; }
 	override abstract @property DeclarationKind kind() const;
- 
+
 	this(Entity parent, string name){ super(parent, name); }
 
 	override void iterateChildren(bool delegate(Entity) del)
@@ -508,7 +521,7 @@ final class Type {
 
 		final switch( kind ){
 			case TypeKind.Primitive: return typeName == other.typeName && typeDecl == other.typeDecl;
-			case TypeKind.Pointer: 
+			case TypeKind.Pointer:
 			case TypeKind.Array: return elementType == other.elementType;
 			case TypeKind.StaticArray: return elementType == other.elementType && arrayLength == other.arrayLength;
 			case TypeKind.AssociativeArray: return elementType == other.elementType && keyType == other.keyType;

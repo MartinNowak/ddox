@@ -187,14 +187,14 @@ int cmdFilterDocs(string[] args)
 			if( idx >= 0 ) return n[0 .. idx];
 			return n;
 		}
-	
+
 		if( json.type == Json.Type.Object ){
 			auto comment = json.comment.opt!string().strip();
 			if( justdoc && comment.empty ){
 				if( parent.type != Json.Type.Object || parent.kind.opt!string() != "template" || templateName(parent) != json.name.opt!string() )
 					return Json.undefined;
 			}
-			
+
 			Protection prot = Protection.Public;
 			if( auto p = "protection" in json ){
 				switch(p.get!string){
@@ -228,7 +228,7 @@ int cmdFilterDocs(string[] args)
 					return Json.undefined;
 				}
 			}
-			
+
 			if (!keepinternals && is_internal) return Json.undefined;
 
 			if (!keeputests && is_unittest) return Json.undefined;
@@ -279,7 +279,7 @@ int cmdFilterDocs(string[] args)
 			auto doc = filterProt(m, Json.undefined, Json.undefined, m);
 			if (doc.type != Json.Type.undefined)
 				dst ~= doc;
-                }
+		}
 	}
 
 	writefln("Writing filtered docs...");

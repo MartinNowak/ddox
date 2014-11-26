@@ -128,6 +128,8 @@ void generateHtmlDocs(Path dst_path, Package root, GeneratorSettings settings = 
 		if( !packpath.empty && !existsFile(packpath) ) createDirectory(packpath);
 		foreach( sp; p.packages ) visitPackage(sp, packpath);
 		foreach( m; p.modules ) visitModule(m, packpath);
+		if( p.packageModule !is null )
+			visitModule(p.packageModule, packpath);
 	}
 
 	dst_path.normalize();
@@ -163,7 +165,7 @@ class DocPageInfo {
 	Module mod;
 	DocGroup[] docGroups; // for multiple doc groups with the same name
 	string nestedName;
-	
+
 	@property NavigationType navigationType() const { return settings.navigationType; }
 	string formatType(Type tp, bool include_code_tags = true) { return .formatType(tp, linkTo, include_code_tags); }
 	string formatDoc(DocGroup group, int hlevel, bool delegate(string) display_section)
@@ -176,7 +178,7 @@ void generateSitemap(OutputStream dst, Package root_package, GeneratorSettings s
 {
 	dst.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
 	dst.write("<urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\">\n");
-	
+
 	void writeEntry(string[] parts...){
 		dst.write("<url><loc>");
 		foreach( p; parts )
@@ -195,7 +197,7 @@ void generateSitemap(OutputStream dst, Package root_package, GeneratorSettings s
 	}
 
 	writeEntityRec(root_package);
-	
+
 	dst.write("</urlset>\n");
 	dst.flush();
 }

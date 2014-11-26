@@ -4,7 +4,8 @@
 	ul.tree-view
 		- foreach(i, p; pack.packages)
 			li.tree-view(class='#{!pack.parent && i == 0 && !info.node.parent || p.isAncestorOf(info.node) ? "" : "collapsed"}')
-				a.package(href="#")= p !is info.rootPackage ? p.name : null
+				- auto href = p.packageModule ? info.linkTo(p.packageModule) : "#";
+				a.package(href='#{href}')= p !is info.rootPackage ? p.name : null
 				- moduleNavTree(p);
 		- foreach(m; pack.modules)
 			li

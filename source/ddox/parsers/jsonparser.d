@@ -340,7 +340,7 @@ private struct Parser
 		if( !str.length ) return null;
 
 		auto tokens = tokenizeDSource(str);
-		
+
 		logDebug("parse type '%s'", str);
 		try {
 			auto type = parseTypeDecl(tokens, sc);
@@ -396,7 +396,7 @@ private struct Parser
 		string[] attributes;
 		auto basic_type = parseBasicType(tokens, sc, attributes);
 		basic_type.attributes ~= attributes;
-		return basic_type;	
+		return basic_type;
 	}
 
 	Type parseBasicType(ref string[] tokens, Entity sc, out string[] attributes)
@@ -409,15 +409,15 @@ private struct Parser
 			"lazy", "out", "ref", "scope", "shared"];
 
 		static immutable member_function_attribute_keywords = ["const", "immutable", "inout", "shared", "pure", "nothrow"];
-		
-			
+
+
 		if( tokens.length > 0 && tokens[0] == "extern" ){
 			enforce(tokens[1] == "(");
 			enforce(tokens[3] == ")");
 			attributes ~= join(tokens[0 .. 4]);
 			tokens = tokens[4 .. $];
 		}
-		
+
 		immutable string[] attribute_keywords = global_attribute_keywords ~ parameter_attribute_keywords ~ member_function_attribute_keywords;
 		/*final switch( sc ){
 			case DeclScope.Global: attribute_keywords = global_attribute_keywords; break;
@@ -475,7 +475,7 @@ private struct Parser
 				type.typeName = join(tokens[start .. end]);
 				//type.typeDecl = cast(Declaration)sc.lookup(type.typeName);
 				tokens.popFrontN(i);
-				
+
 				if (type.typeName == "typeof" && !tokens.empty && tokens.front == "(") {
 					type.typeName ~= "(";
 					tokens.popFront();
@@ -504,7 +504,7 @@ private struct Parser
 						type.templateArgs = tokens[0];
 						tokens.popFront();
 					}
-					
+
 					// HACK: dropping the actual type name here!
 					while (!tokens.empty && tokens.front == ".") {
 						tokens.popFront();
@@ -513,7 +513,7 @@ private struct Parser
 				}
 			}
 		}
-		
+
 		while( !tokens.empty ){
 			if( tokens.front == "*" ){
 				auto ptr = new Type;
@@ -557,7 +557,7 @@ private struct Parser
 				tokens.popFront();
 			} else break;
 		}
-		
+
 		while (!tokens.empty && (tokens.front == "function" || tokens.front == "delegate" || tokens.front == "(")) {
 			Type ftype = new Type;
 			ftype.kind = tokens.front == "(" || tokens.front == "function" ? TypeKind.Function : TypeKind.Delegate;
@@ -603,7 +603,7 @@ private struct Parser
 
 		return type;
 	}
-	
+
 	string[] tokenizeDSource(string dsource_)
 	{
 		static immutable dstring[] tokens = [
@@ -615,21 +615,21 @@ private struct Parser
 			"%", "%=", "^", "^=", "~", "~=", "@", "=>", "#"
 		];
 		static bool[dstring] token_map;
-		
+
 		if( !token_map.length ){
 			foreach( t; tokens )
 				token_map[t] = true;
 			token_map.rehash;
 		}
-		
+
 		dstring dsource = to!dstring(dsource_);
-		
+
 		dstring[] ret;
 		outer:
 		while(true){
 			dsource = stripLeft(dsource);
 			if( dsource.length == 0 ) break;
-			
+
 			// special token?
 			foreach_reverse( i; 1 .. min(5, dsource.length+1) )
 				if( dsource[0 .. i] in token_map ){
@@ -637,7 +637,7 @@ private struct Parser
 					dsource.popFrontN(i);
 					continue outer;
 				}
-			
+
 			// identifier?
 			if( dsource[0] == '_' || std.uni.isAlpha(dsource[0]) ){
 				size_t i = 1;
@@ -646,7 +646,7 @@ private struct Parser
 				dsource.popFrontN(i);
 				continue;
 			}
-			
+
 			// character literal?
 			if( dsource[0] == '\'' ){
 				size_t i = 1;
@@ -659,7 +659,7 @@ private struct Parser
 				dsource.popFrontN(i+1);
 				continue;
 			}
-			
+
 			// string? (incomplete!)
 			if( dsource[0] == '"' ){
 				size_t i = 1;
@@ -672,7 +672,7 @@ private struct Parser
 				dsource.popFrontN(i+1);
 				continue;
 			}
-			
+
 			// number?
 			if( isDigit(dsource[0]) || dsource[0] == '.' ){
 				auto dscopy = dsource;
@@ -683,11 +683,11 @@ private struct Parser
 				else if( dsource.startsWith("f") ) dsource.popFront();
 				continue;
 			}
-			
+
 			ret ~= dsource[0 .. 1];
 			dsource.popFront();
 		}
-		
+
 		auto ret_ = new string[ret.length];
 		foreach( i; 0 .. ret.length ) ret_[i] = to!string(ret[i]);
 		return ret_;
@@ -706,7 +706,7 @@ private struct Parser
 			if( i > 0 && isDigit(ch) ) continue;
 			return false;
 		}
-		return true;	
+		return true;
 	}
 
 	string fullStrip(string s)
